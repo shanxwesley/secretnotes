@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -76,29 +76,17 @@
         }
         .animate-float-1 { animation: float-slow 7s ease-in-out infinite; }
         .animate-pulse-glow { animation: pulse-glow 5s ease-in-out infinite; }
-
-        .note-card {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-        }
-        .note-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 35px rgba(134, 67, 207, 0.14);
-        }
-        .note-card:focus-visible {
-            outline: 3px solid #ba90f0;
-            outline-offset: 3px;
-        }
-
+        .note-card { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; }
+        .note-card:hover { transform: translateY(-4px); box-shadow: 0 20px 35px rgba(134, 67, 207, 0.14); }
+        .note-card:focus-visible { outline: 3px solid #ba90f0; outline-offset: 3px; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(244, 237, 255, 0.4); }
         ::-webkit-scrollbar-thumb { background: rgba(186, 144, 240, 0.6); border-radius: 10px; }
-
         @keyframes toastIn {
             from { transform: translateY(100%) scale(0.9); opacity: 0; }
             to { transform: translateY(0) scale(1); opacity: 1; }
         }
         .toast-animate { animation: toastIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-
         .modal-hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
@@ -146,8 +134,8 @@
             <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-purple-100 text-xs font-semibold text-lavender-700 mb-3 shadow-sm">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span id="active-user-display">@alex</span>
-                <span id="mode-badge" class="bg-lavender-100 text-lavender-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Visitor Send Mode</span>
-                <span id="sync-indicator" class="text-[10px] text-slate-400 border-l border-slate-200 pl-2">Connecting...</span>
+                <span id="mode-badge" class="bg-lavender-100 text-lavender-800 text-[10px] px-2 py-0.5 rounded-full font-bold"></span>
+                <span id="sync-indicator" class="text-[10px] text-slate-400 border-l border-slate-200 pl-2"></span>
             </div>
 
             <h1 id="hero-headline" class="font-display font-black text-3xl sm:text-5xl lg:text-6xl text-slate-800 tracking-tight leading-[1.08] uppercase mb-3"></h1>
@@ -160,7 +148,7 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <i data-lucide="mail" class="w-4 h-4 text-indigo-500"></i>
-                    <span class="font-bold text-slate-800" id="stat-unread">0</span> Bago
+                    <span class="font-bold text-slate-800" id="stat-unread">0</span> New
                 </div>
                 <div class="flex items-center gap-1.5">
                     <i data-lucide="lock" class="w-4 h-4 text-lavender-600"></i>
@@ -201,21 +189,25 @@
 
         <!-- SEND VIEW -->
         <section id="view-send" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
             <form id="send-form" class="lg:col-span-7 glass-card rounded-3xl p-5 sm:p-8 space-y-5" autocomplete="off">
                 <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/60 pb-3">
                     <h2 class="font-display font-bold text-lg sm:text-xl text-slate-800 flex items-center gap-2">
                         <i data-lucide="sparkles" class="w-5 h-5 text-lavender-600"></i>
-                        Note para kay <span id="send-target-user" class="text-lavender-600">@alex</span>
+                        Writing secret note to <span id="send-target-user" class="text-lavender-600">@alex</span>
                     </h2>
                     <span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">🔒 Anonymous</span>
+                </div>
+
+                <div id="self-block-notice" class="hidden text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 flex items-center gap-2">
+                    <i data-lucide="ban" class="w-4 h-4"></i>
+                    <span>You can't send notes to your own page.</span>
                 </div>
 
                 <div>
                     <label for="note-text" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Your Anonymous Message</label>
                     <textarea id="note-text" rows="5" maxlength="300" placeholder="Say something nice, share a secret, or send a compliment..." class="w-full glass-input rounded-2xl p-4 text-slate-800 placeholder-slate-400 font-medium text-sm sm:text-base resize-none"></textarea>
                     <div class="flex justify-between text-xs text-slate-400 mt-1 px-1">
-                        <span>Walang makakaalam kung sino ang nagpadala 💌</span>
+                        <span>No one will know who sent this 💌</span>
                         <span id="char-count">0 / 300</span>
                     </div>
                 </div>
@@ -242,16 +234,16 @@
                 </div>
 
                 <div>
-                    <label for="reveal-delay" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Kailan mabubuksan?</label>
+                    <label for="reveal-delay" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">When can it be opened?</label>
                     <select id="reveal-delay" class="w-full glass-input rounded-xl px-4 py-3 text-slate-800 font-semibold text-sm cursor-pointer">
-                        <option value="0">⚡ Agad (walang hintay)</option>
-                        <option value="1">⏳ Pagkalipas ng 1 araw</option>
-                        <option value="3">🗓️ Pagkalipas ng 3 araw</option>
-                        <option value="7">🕰️ Pagkalipas ng 7 araw</option>
+                        <option value="0">⚡ Now (no wait)</option>
+                        <option value="1">⏳ After 1 day</option>
+                        <option value="3">🗓️ After 3 days</option>
+                        <option value="7">🕰️ After 7 days</option>
                     </select>
                 </div>
 
-                <button type="submit" id="btn-submit-note" class="w-full bg-gradient-to-r from-lavender-600 via-purple-600 to-indigo-600 hover:from-lavender-700 hover:to-indigo-700 disabled:opacity-60 text-white font-bold text-sm sm:text-base py-3.5 rounded-2xl shadow-xl shadow-purple-500/25 transition-all flex items-center justify-center gap-2">
+                <button type="submit" id="btn-submit-note" class="w-full bg-gradient-to-r from-lavender-600 via-purple-600 to-indigo-600 hover:from-lavender-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm sm:text-base py-3.5 rounded-2xl shadow-xl shadow-purple-500/25 transition-all flex items-center justify-center gap-2">
                     <i data-lucide="send" class="w-4 h-4"></i>
                     <span>Send Secret Note Anonymously</span>
                 </button>
@@ -261,12 +253,12 @@
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">Preview</p>
                 <div id="preview-card" class="rounded-3xl p-6 min-h-[280px] flex flex-col shadow-xl border transition-all duration-300">
                     <div class="flex items-center justify-between mb-4">
-                        <span id="preview-category" class="text-xs font-bold px-2.5 py-1 rounded-full bg-pink-100 text-pink-700">🌸 Cute</span>
-                        <span id="preview-sticker" class="text-3xl">🌸</span>
+                        <span id="preview-category" class="text-xs font-bold px-2.5 py-1 rounded-full"></span>
+                        <span id="preview-sticker" class="text-3xl"></span>
                     </div>
                     <p id="preview-text" class="text-base font-medium leading-relaxed flex-1 whitespace-pre-wrap break-words"></p>
                     <div class="flex items-center justify-between mt-6 pt-3 border-t border-black/5 text-xs opacity-70">
-                        <span id="preview-reveal">⚡ Agad mabubuksan</span>
+                        <span id="preview-reveal"></span>
                         <span>Anonymous</span>
                     </div>
                 </div>
@@ -311,7 +303,7 @@
                     <i data-lucide="mail-open" class="w-8 h-8"></i>
                 </div>
                 <h3 class="font-display font-bold text-lg sm:text-xl text-slate-800">No Secret Notes Yet!</h3>
-                <p class="text-slate-500 text-sm max-w-sm">Ibahagi ang link ng page mo sa mga kaibigan para makatanggap ng unang note.</p>
+                <p class="text-slate-500 text-sm max-w-sm">Share your page link with friends to get your first note.</p>
                 <button id="btn-copy-empty" class="mt-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-5 py-2.5 rounded-full transition-all flex items-center gap-2 shadow-sm">
                     <i data-lucide="copy" class="w-4 h-4 text-lavender-600"></i>
                     Copy My Secret Link
@@ -332,7 +324,7 @@
                 </div>
                 <h3 class="font-display font-extrabold text-2xl text-slate-800">Access Page / Create Handle</h3>
                 <p class="text-xs sm:text-sm text-slate-500 max-w-xs mx-auto">
-                    Ilagay ang handle at PIN. Kapag bago ang handle, awtomatiko itong magre-register gamit ang PIN.
+                    Enter your handle and PIN. A new handle is registered automatically with the PIN you choose.
                 </p>
             </div>
             <div class="space-y-4">
@@ -340,13 +332,13 @@
                     <label for="auth-username" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Page Username / Handle</label>
                     <div class="relative">
                         <span class="absolute left-4 top-3.5 text-slate-400 font-bold">@</span>
-                        <input type="text" id="auth-username" placeholder="e.g. pinkcat o alex" class="w-full glass-input rounded-xl pl-9 pr-4 py-3 text-slate-800 font-semibold text-sm">
+                        <input type="text" id="auth-username" placeholder="e.g. pinkcat or alex" class="w-full glass-input rounded-xl pl-9 pr-4 py-3 text-slate-800 font-semibold text-sm">
                     </div>
                 </div>
                 <div>
                     <label for="auth-pin" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Secret Passcode / PIN</label>
                     <input type="password" id="auth-pin" inputmode="numeric" placeholder="4-8 digit PIN" maxlength="8" class="w-full glass-input rounded-xl px-4 py-3 text-slate-800 font-semibold text-sm">
-                    <p class="text-[11px] text-slate-400 mt-1">Tandaan ang PIN para mabuksan ang dashboard sa kahit anong device.</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Remember this PIN to open your dashboard on any device.</p>
                 </div>
             </div>
             <div class="flex gap-3 pt-2">
@@ -418,12 +410,12 @@
         // ===== CONFIG =====
         const STICKERS = ["🌸", "✨", "💌", "💖", "🌙", "🧁", "🐾", "🎀", "🧸", "🦄"];
         const THEMES = [
-            { id: "lavender", label: "Lavender", bg: "bg-purple-50/90", border: "border-purple-200", text: "text-purple-900" },
-            { id: "rose",     label: "Rose",     bg: "bg-pink-50/90",   border: "border-pink-200",   text: "text-pink-900" },
-            { id: "sky",      label: "Sky",      bg: "bg-sky-50/90",    border: "border-sky-200",    text: "text-sky-900" },
-            { id: "mint",     label: "Mint",     bg: "bg-emerald-50/90",border: "border-emerald-200",text: "text-emerald-900" },
-            { id: "peach",    label: "Peach",    bg: "bg-amber-50/90",  border: "border-amber-200",  text: "text-amber-900" },
-            { id: "dark",     label: "Night",    bg: "bg-slate-800/90", border: "border-slate-700",  text: "text-white" }
+            { id: "lavender", label: "Lavender", bg: "bg-purple-50/90",  border: "border-purple-200",  text: "text-purple-900" },
+            { id: "rose",     label: "Rose",     bg: "bg-pink-50/90",    border: "border-pink-200",    text: "text-pink-900" },
+            { id: "sky",      label: "Sky",      bg: "bg-sky-50/90",     border: "border-sky-200",     text: "text-sky-900" },
+            { id: "mint",     label: "Mint",     bg: "bg-emerald-50/90", border: "border-emerald-200", text: "text-emerald-900" },
+            { id: "peach",    label: "Peach",    bg: "bg-amber-50/90",   border: "border-amber-200",   text: "text-amber-900" },
+            { id: "dark",     label: "Night",    bg: "bg-slate-800/90",  border: "border-slate-700",   text: "text-white" }
         ];
         const CAT_STYLE = {
             Cute: "bg-pink-100 text-pink-700",
@@ -462,12 +454,12 @@
         }
 
         function formatDate(ms) {
-            return ms ? new Date(ms).toLocaleString("tl-PH", { dateStyle: "medium", timeStyle: "short" }) : "";
+            return ms ? new Date(ms).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) : "";
         }
 
         function timeLeft(ms) {
             const diff = ms - Date.now();
-            if (diff <= 0) return "ngayon";
+            if (diff <= 0) return "now";
             const d = Math.floor(diff / DAY);
             const h = Math.floor((diff % DAY) / 3600000);
             const m = Math.floor((diff % 3600000) / 60000);
@@ -486,11 +478,9 @@
         function showToast(message, icon = "check-circle") {
             const toast = $("toast");
             $("toast-message").innerText = message;
-            const iconEl = $("toast-icon");
-            iconEl.setAttribute("data-lucide", icon);
+            $("toast-icon").setAttribute("data-lucide", icon);
             lucide.createIcons();
-            toast.classList.remove("hidden");
-            toast.classList.remove("toast-animate");
+            toast.classList.remove("hidden", "toast-animate");
             void toast.offsetWidth;
             toast.classList.add("toast-animate");
             clearTimeout(window._toastTimer);
@@ -509,6 +499,12 @@
             modal.querySelector("[id$='-content']")?.classList.replace("scale-100", "scale-95");
         }
 
+        function setSyncStatus(text, cls) {
+            const el = $("sync-indicator");
+            el.innerText = text;
+            el.className = `text-[10px] border-l border-slate-200 pl-2 ${cls}`;
+        }
+
         // ===== INIT =====
         window.addEventListener("load", () => {
             const params = new URLSearchParams(window.location.search);
@@ -523,8 +519,8 @@
             bindEvents();
             initPickers();
             selectCategory(selectedCategory);
-            updatePreview();
             updateUI();
+            updatePreview();
             switchTab(isOwner && userParam === null ? "inbox" : "send");
             if (isOwner) listenToNotes();
             lucide.createIcons();
@@ -537,8 +533,8 @@
             $("nav-inbox").addEventListener("click", showMyOwnerDashboard);
             $("tab-btn-send").addEventListener("click", () => switchTab("send"));
             $("tab-btn-inbox").addEventListener("click", () => switchTab("inbox"));
-            $("btn-open-auth").addEventListener("click", () => openAuthModal());
-            $("btn-unlock").addEventListener("click", () => openAuthModal());
+            $("btn-open-auth").addEventListener("click", openAuthModal);
+            $("btn-unlock").addEventListener("click", openAuthModal);
             $("btn-share").addEventListener("click", copyShareLink);
             $("btn-copy-empty").addEventListener("click", copyShareLink);
             $("btn-sync").addEventListener("click", () => { listenToNotes(); showToast("Notes refreshed!", "refresh-cw"); });
@@ -570,7 +566,6 @@
                 if (e.key === "Escape") { closeModal("auth-modal"); closeModal("read-note-modal"); }
             });
 
-            // Refresh countdowns every 30 seconds
             setInterval(() => { if (isOwner) renderNotes(); }, 30000);
         }
 
@@ -608,18 +603,17 @@
 
         // ===== PREVIEW =====
         function updatePreview() {
-            const card = $("preview-card");
             const theme = THEMES.find(t => t.id === selectedTheme) || THEMES[0];
             const text = $("note-text").value.trim();
             const days = parseInt($("reveal-delay").value, 10) || 0;
 
-            card.className = `rounded-3xl p-6 min-h-[280px] flex flex-col shadow-xl border transition-all duration-300 ${theme.bg} ${theme.border} ${theme.text}`;
+            $("preview-card").className = `rounded-3xl p-6 min-h-[280px] flex flex-col shadow-xl border transition-all duration-300 ${theme.bg} ${theme.border} ${theme.text}`;
             $("preview-category").className = `text-xs font-bold px-2.5 py-1 rounded-full ${CAT_STYLE[selectedCategory] || ""}`;
-            $("preview-category").innerText = `${selectedCategory}`;
+            $("preview-category").innerText = selectedCategory;
             $("preview-sticker").innerText = selectedSticker;
-            $("preview-text").innerText = text || "Ang mensahe mo ay lalabas dito...";
+            $("preview-text").innerText = text || "Your message will appear here...";
             $("preview-text").style.opacity = text ? "1" : "0.5";
-            $("preview-reveal").innerText = days === 0 ? "⚡ Agad mabubuksan" : `⏳ Mabubuksan pagkalipas ng ${days} araw`;
+            $("preview-reveal").innerText = days === 0 ? "⚡ Opens immediately" : `⏳ Opens after ${days} day${days > 1 ? "s" : ""}`;
         }
 
         // ===== UI STATE =====
@@ -630,24 +624,34 @@
             $("dashboard-user-tag").innerText = `@${currentUser}`;
 
             const badge = $("mode-badge");
+            const headline = $("hero-headline");
+            const sub = $("hero-subtext");
+            const grad = "bg-clip-text text-transparent bg-gradient-to-r from-lavender-600 via-purple-600 to-indigo-600";
+
             if (isOwner) {
                 badge.innerText = "Owner View";
                 badge.className = "bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold";
                 $("nav-login-btn-text").innerText = `My Page (@${currentUser})`;
-                $("hero-headline").innerHTML = `YOUR <span class="bg-clip-text text-transparent bg-gradient-to-r from-lavender-600 via-purple-600 to-indigo-600">SECRET INBOX</span>`;
-                $("hero-subtext").innerText = "Dito lalabas ang mga anonymous note. Ang mga sealed note ay mabubuksan lang kapag dumating na ang oras.";
+                headline.innerHTML = `YOUR <span class="${grad}">SECRET INBOX</span>`;
+                sub.innerText = "Anonymous notes appear here. Sealed notes unlock when their time arrives.";
                 $("owner-stats-bar").classList.remove("hidden");
             } else {
                 badge.innerText = "Visitor Send Mode";
                 badge.className = "bg-lavender-100 text-lavender-800 text-[10px] px-2 py-0.5 rounded-full font-bold";
                 $("nav-login-btn-text").innerText = "Owner Login";
-                $("hero-headline").innerHTML = `SEND A <span class="bg-clip-text text-transparent bg-gradient-to-r from-lavender-600 via-purple-600 to-indigo-600">SECRET NOTE</span>`;
-                $("hero-subtext").innerText = "Mag-iwan ng anonymous compliment o lihim na mensahe. Ang may-ari lang ng page ang makakabasa.";
+                headline.innerHTML = `SEND A <span class="${grad}">SECRET NOTE</span>`;
+                sub.innerText = "Leave an anonymous compliment or secret message. Only the page owner can read it.";
                 $("owner-stats-bar").classList.add("hidden");
             }
 
-            $("send-target-user").parentElement.classList.toggle("hidden", false);
-            setSyncStatus(isOwner ? "Connecting..." : "🔒 Private", isOwner ? "text-slate-400" : "text-slate-400");
+            // Block the owner from sending notes to their own page
+            $("self-block-notice").classList.toggle("hidden", !isOwner);
+            $("btn-submit-note").disabled = isOwner;
+            $("btn-submit-note").querySelector("span").innerText = isOwner
+                ? "You can't send to your own page"
+                : "Send Secret Note Anonymously";
+
+            setSyncStatus(isOwner ? "Connecting..." : "🔒 Private", "text-slate-400");
         }
 
         function switchTab(tab) {
@@ -661,11 +665,10 @@
             $("tab-btn-inbox").className = tab === "inbox" ? activeCls : idleCls;
 
             if (tab === "inbox") {
-                const unlocked = isOwner;
-                $("owner-lock-screen").classList.toggle("hidden", unlocked);
-                $("owner-dashboard-header").classList.toggle("hidden", !unlocked);
-                $("filter-container").classList.toggle("hidden", !unlocked);
-                if (unlocked) renderNotes();
+                $("owner-lock-screen").classList.toggle("hidden", isOwner);
+                $("owner-dashboard-header").classList.toggle("hidden", !isOwner);
+                $("filter-container").classList.toggle("hidden", !isOwner);
+                if (isOwner) renderNotes();
                 else {
                     $("notes-container").classList.add("hidden");
                     $("empty-state").classList.add("hidden");
@@ -679,12 +682,6 @@
         function showMyOwnerDashboard() {
             if (isOwner) switchTab("inbox");
             else openAuthModal();
-        }
-
-        function setSyncStatus(text, cls) {
-            const el = $("sync-indicator");
-            el.innerText = text;
-            el.className = `text-[10px] border-l border-slate-200 pl-2 ${cls}`;
         }
 
         // ===== REALTIME NOTES (owner only) =====
@@ -767,7 +764,7 @@
                     class="note-card flex flex-col text-left w-full h-full min-h-[200px] rounded-2xl p-5 border ${theme.bg} ${theme.border} ${theme.text} ${unread ? "ring-2 ring-lavender-400/60" : ""}">
                     <div class="flex items-center justify-between gap-2 mb-3">
                         <span class="text-xs font-bold px-2.5 py-1 rounded-full ${CAT_STYLE[n.category] || "bg-slate-100 text-slate-700"}">${escapeHtml(n.sticker || "💌")} ${escapeHtml(n.category || "")}</span>
-                        ${unread ? '<span class="flex items-center gap-1 text-[10px] font-bold text-lavender-700"><span class="w-2 h-2 rounded-full bg-lavender-600 animate-pulse"></span>Bago</span>' : ""}
+                        ${unread ? '<span class="flex items-center gap-1 text-[10px] font-bold text-lavender-700"><span class="w-2 h-2 rounded-full bg-lavender-600 animate-pulse"></span>New</span>' : ""}
                     </div>
                     <p class="text-sm font-medium leading-relaxed line-clamp-5 flex-1 break-words">${escapeHtml(n.text)}</p>
                     <div class="flex items-center justify-between mt-4 pt-3 border-t border-black/5 text-[11px] opacity-75">
@@ -785,20 +782,20 @@
                 <div class="flex flex-col items-center justify-center text-center w-full h-full min-h-[200px] rounded-2xl p-5 border-2 border-dashed border-lavender-300 bg-gradient-to-br from-lavender-50/90 to-purple-100/70">
                     <div class="text-4xl mb-2 animate-float-1">🔒</div>
                     <p class="font-display font-bold text-lavender-800">Sealed Whisper</p>
-                    <p class="text-xs text-slate-500 mt-1">Mabubuksan sa loob ng <span class="font-bold text-slate-700">${timeLeft(end)}</span></p>
+                    <p class="text-xs text-slate-500 mt-1">Opens in <span class="font-bold text-slate-700">${timeLeft(end)}</span></p>
                     <div class="w-full max-w-[220px] h-1.5 bg-white/80 rounded-full mt-4 overflow-hidden">
                         <div class="h-full bg-gradient-to-r from-lavender-400 to-purple-600 rounded-full transition-all" style="width:${pct}%"></div>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-1">${pct}% na</p>
+                    <p class="text-[10px] text-slate-400 mt-1">${pct}% elapsed</p>
                 </div>`;
         }
 
         // ===== NOTE MODAL =====
-        window.openReadNote = function (id) {
+        function openReadNote(id) {
             const note = cloudNotes.find(n => n.id === id);
             if (!note) return;
             if ((note.revealAt || 0) > Date.now()) {
-                showToast("Hindi pa pwedeng buksan ang note na ito!", "lock");
+                showToast("This note isn't open yet!", "lock");
                 return;
             }
 
@@ -814,11 +811,11 @@
 
             const alreadyHearted = getStoredList(heartKey()).includes(id);
             $("btn-modal-heart").disabled = alreadyHearted;
-            $("btn-modal-heart").querySelector("i")?.classList.toggle("fill-pink-500", alreadyHearted);
 
             openModal("read-note-modal");
             lucide.createIcons();
-        };
+        }
+        window.openReadNote = openReadNote;
 
         function markAsRead(id) {
             const list = getStoredList(readKey());
@@ -828,8 +825,6 @@
             }
             renderNotes();
         }
-
-        window.sendHeartToNote = undefined;
 
         async function sendHeartToNote() {
             if (!activeNoteId || !isOwner) return;
@@ -845,13 +840,13 @@
                 showToast("Heart sent! ❤️", "heart");
             } catch (e) {
                 console.error("Heart failed:", e);
-                showToast("Hindi na-send ang heart.", "alert-circle");
+                showToast("Heart could not be sent.", "alert-circle");
             }
         }
 
         async function deleteActiveNote() {
             if (!activeNoteId || !isOwner) return;
-            if (!confirm("Burahin ang note na ito permanently?")) return;
+            if (!confirm("Delete this note permanently?")) return;
             try {
                 await deleteDoc(doc(db, MESSAGES, activeNoteId));
                 closeModal("read-note-modal");
@@ -859,7 +854,7 @@
                 activeNoteId = null;
             } catch (e) {
                 console.error("Delete failed:", e);
-                showToast("Hindi nabura ang note.", "alert-circle");
+                showToast("Note could not be deleted.", "alert-circle");
             }
         }
 
@@ -875,8 +870,8 @@
             const handle = sanitizeHandle($("auth-username").value.trim());
             const pin = $("auth-pin").value.trim();
 
-            if (!handle || !pin) return showToast("Ilagay ang handle at PIN!", "alert-circle");
-            if (!/^\d{4,8}$/.test(pin)) return showToast("Dapat 4-8 digits ang PIN!", "alert-circle");
+            if (!handle || !pin) return showToast("Enter both handle and PIN!", "alert-circle");
+            if (!/^\d{4,8}$/.test(pin)) return showToast("PIN must be 4-8 digits!", "alert-circle");
 
             const btn = $("btn-auth");
             btn.disabled = true;
@@ -892,7 +887,7 @@
                 } else if (snap.data().pinHash === pinHash) {
                     showToast("Logged in! Dashboard unlocked.", "shield-check");
                 } else {
-                    return showToast("Mali ang PIN para sa handle na ito!", "alert-circle");
+                    return showToast("Wrong PIN for this handle!", "alert-circle");
                 }
 
                 localStorage.setItem("whisper_owner", handle);
@@ -906,14 +901,14 @@
                 switchTab("inbox");
             } catch (e) {
                 console.error("Auth error:", e);
-                showToast("Hindi nakapag-login. Tingnan ang connection.", "alert-circle");
+                showToast("Login failed. Check your connection.", "alert-circle");
             } finally {
                 btn.disabled = false;
             }
         }
 
         function logoutOwner() {
-            if (!confirm("Mag-logout sa dashboard na ito?")) return;
+            if (!confirm("Log out of this dashboard?")) return;
             localStorage.removeItem("whisper_owner");
             isOwner = false;
             if (unsubscribeNotes) { unsubscribeNotes(); unsubscribeNotes = null; }
@@ -921,14 +916,16 @@
             updateUI();
             renderNotes();
             switchTab("send");
-            showToast("Naka-logout ka na.", "log-out");
+            showToast("You've been logged out.", "log-out");
         }
 
         // ===== SEND NOTE =====
         async function submitSecretNote() {
+            if (isOwner) return showToast("You can't send notes to your own page.", "ban");
+
             const input = $("note-text");
             const text = input.value.trim();
-            if (!text) return showToast("Sumulat muna ng mensahe!", "alert-circle");
+            if (!text) return showToast("Write a message first!", "alert-circle");
 
             const days = parseInt($("reveal-delay").value, 10) || 0;
             const createdAt = Date.now();
@@ -952,13 +949,13 @@
                 input.value = "";
                 $("char-count").innerText = "0 / 300";
                 updatePreview();
-                showToast(days === 0 ? "Secret note sent! 💖" : `Sealed note sent! Mabubuksan sa loob ng ${days} araw 🔒`, "sparkles");
+                showToast(days === 0 ? "Secret note sent! 💖" : `Sealed note sent! Opens in ${days} day${days > 1 ? "s" : ""} 🔒`, "sparkles");
             } catch (e) {
                 console.error("Send failed:", e);
-                showToast("Hindi na-send. Tingnan ang connection.", "alert-circle");
+                showToast("Could not send. Check your connection.", "alert-circle");
             } finally {
-                btn.disabled = false;
-                btn.querySelector("span").innerText = "Send Secret Note Anonymously";
+                btn.disabled = isOwner;
+                btn.querySelector("span").innerText = isOwner ? "You can't send to your own page" : "Send Secret Note Anonymously";
             }
         }
 
@@ -967,7 +964,7 @@
             const link = `${location.origin}${location.pathname}?u=${currentUser}`;
             navigator.clipboard.writeText(link)
                 .then(() => showToast("Link copied! 🚀", "copy"))
-                .catch(() => showToast("Hindi na-copy. Link: " + link, "alert-circle"));
+                .catch(() => showToast("Could not copy. Link: " + link, "alert-circle"));
         }
     </script>
 </body>
