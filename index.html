@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Whisper.me | Cute Anonymous Messages</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        lavender: {
+                            50: '#fbf8ff',
+                            100: '#f4edff',
+                            200: '#e9daff',
+                            300: '#d5bbf7',
+                            400: '#ba90f0',
+                            500: '#9f63e6',
+                            600: '#8643cf',
+                            700: '#7133b1',
+                            800: '#5e2b90',
+                            900: '#4e2575',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #e4daf7 0%, #ecd6f7 35%, #e1d3fb 70%, #d8ccfc 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Glassmorphic elements */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            box-shadow: 0 20px 40px rgba(134, 67, 207, 0.08);
+        }
+
+        .glass-pill {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 24px rgba(113, 51, 177, 0.06);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #ba90f0;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(186, 144, 240, 0.25);
+        }
+
+        /* Smooth Floating Animations */
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-16px) rotate(4deg); }
+        }
+
+        @keyframes float-reverse {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(14px) rotate(-4deg); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.06); }
+        }
+
+        .animate-float-1 { animation: float-slow 7s ease-in-out infinite; }
+        .animate-float-2 { animation: float-reverse 9s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 5s ease-in-out infinite; }
+
+        /* 3D Glass Geometric Ribbons (Matching reference UI) */
+        .ribbon-shape {
+            background: linear-gradient(135deg, rgba(213, 187, 247, 0.6), rgba(255, 255, 255, 0.35));
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            box-shadow: inset -10px -10px 30px rgba(159, 99, 230, 0.25), inset 10px 10px 30px rgba(255, 255, 255, 0.9), 0 20px 40px rgba(113, 51, 177, 0.12);
+            backdrop-filter: blur(10px);
+        }
+
+        .ring-shape {
+            border: 20px solid rgba(255, 255, 255, 0.45);
+            border-right-color: rgba(186, 144, 240, 0.65);
+            border-top-color: rgba(233, 218, 255, 0.85);
+            border-radius: 50%;
+            box-shadow: 0 20px 45px rgba(113, 51, 177, 0.12), inset 0 0 20px rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Note Cards interactive effects */
+        .note-card-hover {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .note-card-hover:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 20px 35px rgba(134, 67, 207, 0.12);
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(244, 237, 255, 0.4);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(186, 144, 240, 0.6);
+            border-radius: 10px;
+        }
+
+        /* Toast animation */
+        @keyframes toastIn {
+            from { transform: translateY(100%) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .toast-animate {
+            animation: toastIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-slate-800 selection:bg-lavender-300 selection:text-lavender-900 pb-16">
+
+    <!-- Ambient Glowing Background Spheres -->
+    <div class="fixed top-[-10%] left-[-5%] w-[55vw] h-[55vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tr from-purple-300/40 to-pink-200/40 blur-3xl pointer-events-none animate-pulse-glow"></div>
+    <div class="fixed bottom-[-10%] right-[-5%] w-[60vw] h-[60vw] max-w-[650px] max-h-[650px] rounded-full bg-gradient-to-br from-indigo-200/40 to-lavender-400/40 blur-3xl pointer-events-none animate-pulse-glow" style="animation-delay: -2.5s;"></div>
+
+    <!-- Floating 3D Geometric Aesthetics -->
+    <div class="fixed top-36 left-[5%] w-36 sm:w-48 h-36 sm:h-48 ribbon-shape animate-float-1 pointer-events-none hidden md:block z-0"></div>
+    <div class="fixed bottom-24 left-[8%] w-28 sm:w-32 h-28 sm:h-32 ring-shape animate-float-2 pointer-events-none hidden lg:block z-0" style="transform: rotateX(55deg) rotateY(-20deg);"></div>
+    <div class="fixed top-48 right-[6%] w-32 sm:w-40 h-32 sm:h-40 ribbon-shape animate-float-2 pointer-events-none hidden md:block z-0" style="border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+
+        <!-- Top Navigation Bar -->
+        <header class="flex items-center justify-between py-2.5 px-4 sm:px-6 glass-pill rounded-full mb-6 sm:mb-8 transition-all">
+            <!-- Brand Logo -->
+            <a href="#" onclick="switchTab('send')" class="flex items-center gap-2 font-display font-bold text-lg sm:text-xl tracking-tight text-slate-800">
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-lavender-500 to-purple-400 flex items-center justify-center text-white shadow-md shadow-lavender-400/40">
+                    <i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </div>
+                <span>whisper<span class="text-lavender-600">.me</span></span>
+            </a>
+
+            <!-- Nav Items -->
+            <nav class="hidden md:flex items-center gap-6 font-semibold text-xs sm:text-sm text-slate-600">
+                <button onclick="showMyOwnerDashboard()" id="nav-inbox" class="hover:text-lavender-700 transition-colors flex items-center gap-1.5">
+                    <i data-lucide="inbox" class="w-4 h-4"></i> My Dashboard
+                </button>
+                <button onclick="switchTab('send')" id="nav-send" class="hover:text-lavender-700 transition-colors flex items-center gap-1.5 text-lavender-700 font-bold">
+                    <i data-lucide="send" class="w-4 h-4"></i> Send Secret Note
+                </button>
+            </nav>
+
+            <!-- CTA Buttons -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="openAuthModal()" class="glass-pill border-white/80 bg-white/90 hover:bg-white text-slate-700 text-xs font-semibold px-3.5 sm:px-4 py-2 rounded-full transition-all flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-lavender-600"></i>
+                    <span id="nav-login-btn-text">Owner Login</span>
+                </button>
+
+                <button onclick="copyShareLink()" class="bg-gradient-to-r from-lavender-600 to-purple-600 hover:from-lavender-700 hover:to-purple-700 text-white text-xs font-semibold px-3.5 sm:px-4 py-2 rounded-full shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all flex items-center gap-1.5">
+                    <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+                    <span>Share Link</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Primary Container -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <!-- Main Aesthetic Hero Banner -->
+                <div class="glass-card rounded-3xl p-6 sm:p-10 relative overflow-hidden">
+                    <div class="absolute -right-8 -bottom-8 w-44 h-44 bg-gradient-to-tl from-lavender-300/40 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+
+                    <!-- Mode Indicator Tag -->
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-purple-100 text-xs font-semibold text-lavender-700 mb-3 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="active-user-display">@alex</span>
+                        <span id="mode-badge" class="bg-lavender-100 text-lavender-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-1">Send Mode</span>
+                        <span id="sync-indicator" class="text-[10px] text-slate-400 border-l border-slate-200 pl-2">Syncing...</span>
+                    </div>
+
+                    <h1 class="font-display font-black text-3xl sm:text-5xl lg:text-6xl text-slate-800 tracking-tight leading-[1.08] uppercase mb-3" id="hero-headline">
+                        SEND A <span class="bg-clip-text text-transparent bg-gradient-to-r from-lavender-600 via-purple-600 to-indigo-600">SECRET NOTE</span>
+                    </h1>
+
+                    <p class="text-slate-600 font-medium text-sm sm:text-base max-w-xl leading-relaxed" id="hero-subtext">
+                        Leave an anonymous compliment or secret message! Only the page owner can unlock and read received notes.
+                    </p>
+
+                    <!-- Real-time Stats (Visible in Owner View) -->
+                    <div id="owner-stats-bar" class="flex flex-wrap items-center gap-4 sm:gap-6 mt-6 pt-4 border-t border-white/60 text-slate-600 text-xs sm:text-sm font-semibold hidden">
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="message-circle" class="w-4 h-4 text-lavender-600"></i>
+                            <span class="font-bold text-slate-800" id="stat-total-notes">0</span> Received Notes
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <i data-lucide="heart" class="w-4 h-4 text-pink-500"></i>
+                            <span class="font-bold text-slate-800" id="stat-total-hearts">0</span> Hearts Received
+                        </div>
+                        <div class="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            <span>Authenticated Owner</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs & Category Filters -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/60 gap-2">
+                    <div class="flex gap-1.5">
+                        <button onclick="switchTab('send')" id="tab-btn-send" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-lavender-700 shadow-sm">
+                            <i data-lucide="pen-tool" class="w-4 h-4"></i> Send Note
+                        </button>
+                        <button onclick="switchTab('inbox')" id="tab-btn-inbox" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900">
+                            <i data-lucide="lock" class="w-4 h-4"></i> Owner Inbox
+                            <span id="unread-badge" class="bg-lavender-600 text-white text-[10px] px-2 py-0.5 rounded-full ml-1 hidden">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Category Filter Dropdown (Owner View Only) -->
+                    <div id="filter-container" class="px-1 hidden">
+                        <select id="category-filter" onchange="renderNotes()" class="w-full sm:w-auto glass-input text-xs font-semibold text-slate-700 px-3 py-2 rounded-xl border-white/80 cursor-pointer focus:ring-0">
+                            <option value="all">All Categories</option>
+                            <option value="Cute">🌸 Cute</option>
+                            <option value="Secret">🔒 Secret</option>
+                            <option value="Compliment">✨ Compliment</option>
+                            <option value="Random">🎲 Random</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- VIEW 1: Send Message Form (Default for visitors) -->
+                <div id="view-send-form" class="glass-card rounded-3xl p-5 sm:p-8 space-y-5">
+                    <div class="flex items-center justify-between border-b border-white/60 pb-3">
+                        <h2 class="font-display font-bold text-lg sm:text-xl text-slate-800 flex items-center gap-2">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-lavender-600"></i>
+                            Writing secret note to <span id="send-target-user" class="text-lavender-600">@alex</span>
+                        </h2>
+                        <span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">🔒 Anonymous</span>
+                    </div>
+
+                    <!-- Note Content Input -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Your Anonymous Message</label>
+                        <textarea id="note-text" rows="4" maxlength="300" placeholder="Say something nice, share a secret, or send a compliment..." class="w-full glass-input rounded-2xl p-4 text-slate-800 placeholder-slate-400 font-medium text-sm sm:text-base resize-none transition-all"></textarea>
+                        <div class="flex justify-between text-xs text-slate-400 mt-1 px-1">
+                            <span>No one else can see your message 💌</span>
+                            <span id="char-count">0 / 300</span>
+                        </div>
+                    </div>
+
+                    <!-- Sticker Picker -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Attach a Cute Sticker</label>
+                        <div class="flex flex-wrap gap-2" id="sticker-picker"></div>
+                    </div>
+
+                    <!-- Color / Theme Selector -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Note Style Theme</label>
+                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="theme-picker"></div>
+                    </div>
+
+                    <!-- Category Selector -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Category Tag</label>
+                        <div class="flex flex-wrap gap-2" id="category-picker">
+                            <button type="button" onclick="selectCategory('Cute')" class="cat-btn bg-pink-100 text-pink-700 border-pink-200 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ring-2 ring-lavender-600">🌸 Cute</button>
+                            <button type="button" onclick="selectCategory('Compliment')" class="cat-btn bg-purple-100 text-purple-700 border-purple-200 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border">✨ Compliment</button>
+                            <button type="button" onclick="selectCategory('Secret')" class="cat-btn bg-indigo-100 text-indigo-700 border-indigo-200 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border">🔒 Secret</button>
+                            <button type="button" onclick="selectCategory('Random')" class="cat-btn bg-amber-100 text-amber-700 border-amber-200 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border">🎲 Random</button>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button onclick="submitSecretNote()" id="btn-submit-note" class="w-full bg-gradient-to-r from-lavender-600 via-purple-600 to-indigo-600 hover:from-lavender-700 hover:to-indigo-700 text-white font-bold text-sm sm:text-base py-3.5 rounded-2xl shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 transition-all flex items-center justify-center gap-2 group">
+                        <i data-lucide="send" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        <span>Send Secret Note Anonymously</span>
+                    </button>
+                </div>
+
+                <!-- VIEW 2: Owner Notes Grid View (Locked for Visitors) -->
+                <div id="view-inbox" class="space-y-4 hidden">
+                    <!-- Locked Guard Box -->
+                    <div id="owner-lock-screen" class="glass-card rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center justify-center gap-4">
+                        <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-lavender-600 mb-1">
+                            <i data-lucide="lock" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-xl text-slate-800">Owner Access Required</h3>
+                        <p class="text-slate-500 text-xs sm:text-sm max-w-sm">
+                            Only the owner of <span class="font-bold text-lavender-600" id="lock-handle-display">@alex</span> can view incoming messages.
+                        </p>
+                        <button onclick="openAuthModal()" class="bg-gradient-to-r from-lavender-600 to-purple-600 text-white font-bold text-xs px-6 py-3 rounded-full transition-all flex items-center gap-2 shadow-lg shadow-purple-500/20 hover:scale-105">
+                            <i data-lucide="key" class="w-4 h-4"></i>
+                            Unlock My Dashboard
+                        </button>
+                    </div>
+
+                    <!-- Notes Grid (Visible after PIN auth) -->
+                    <div id="notes-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden"></div>
+
+                    <!-- Empty State -->
+                    <div id="empty-state" class="glass-card rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center justify-center gap-4 hidden">
+                        <div class="w-16 h-16 rounded-full bg-lavender-100 flex items-center justify-center text-lavender-600 mb-1">
+                            <i data-lucide="mail-open" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-lg sm:text-xl text-slate-800">No Secret Notes Yet!</h3>
+                        <p class="text-slate-500 text-xs sm:text-sm max-w-sm">
+                            Share your page link with your friends to get your first secret note!
+                        </p>
+                        <button onclick="copyShareLink()" class="mt-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-5 py-2.5 rounded-full transition-all flex items-center gap-2 shadow-sm">
+                            <i data-lucide="copy" class="w-4 h-4 text-lavender-600"></i>
+                            Copy My Secret Link
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Sidebar: Profile & Actions Widget -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <!-- Profile & Share Card -->
+                <div class="glass-card rounded-3xl p-5 sm:p-6 relative overflow-hidden">
+                    <div class="flex items-center gap-3.5 mb-4">
+                        <div class="relative">
+                            <div id="profile-avatar" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-400 flex items-center justify-center text-white text-xl font-black shadow-md">
+                                A
+                            </div>
+                            <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full"></span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="font-display font-bold text-base sm:text-lg text-slate-800 truncate" id="card-username">Alex</h3>
+                            <p class="text-xs text-slate-500 truncate" id="card-handle">whisper.me/?u=alex</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/60 rounded-2xl p-3.5 border border-white/80 space-y-2 mb-4">
+                        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Your Shareable Link</div>
+                        <div class="flex items-center justify-between gap-2 bg-white/80 p-2 rounded-xl border border-purple-100">
+                            <span class="text-xs font-mono text-slate-600 truncate" id="share-link-input">https://whisper.me/?u=alex</span>
+                            <button onclick="copyShareLink()" class="p-1.5 hover:bg-lavender-100 rounded-lg text-lavender-700 transition-colors" title="Copy link">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="copyShareLink()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs py-2.5 px-3 rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                            <i data-lucide="share-2" class="w-3.5 h-3.5 text-lavender-600"></i>
+                            Share Link
+                        </button>
+                        <button onclick="openAuthModal()" class="bg-lavender-100 hover:bg-lavender-200 text-lavender-700 font-bold text-xs py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5">
+                            <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                            Switch / Create
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Floating Quote Widget -->
+                <div class="glass-card rounded-3xl p-4 relative overflow-hidden">
+                    <div class="relative h-40 rounded-2xl overflow-hidden bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900 flex flex-col justify-between p-4 text-white">
+                        <div class="relative z-10 flex justify-between items-start">
+                            <span class="bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase">Idea Generator</span>
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-300"></i>
+                        </div>
+
+                        <div class="relative z-10 space-y-1">
+                            <p class="text-[11px] text-purple-200 font-medium">Inspiration Prompt:</p>
+                            <p class="text-xs font-semibold italic text-white/90 line-clamp-2" id="inspiration-quote">
+                                "You make every room brighter just by walking into it! 🌟"
+                            </p>
+                        </div>
+
+                        <button onclick="nextInspiration()" class="relative z-10 text-[11px] font-bold text-lavender-200 hover:text-white flex items-center gap-1 transition-colors">
+                            <span>Get another prompt</span>
+                            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- CENTERED MODAL: Unified Page Creation & Owner Login -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card bg-white/95 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-6 shadow-2xl transform scale-95 transition-all duration-300 relative border border-white/80" id="auth-modal-content">
+            <button onclick="closeAuthModal()" class="absolute right-5 top-5 p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="text-center space-y-2 pt-2">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-lavender-500 to-purple-600 flex items-center justify-center text-white mx-auto shadow-lg shadow-lavender-400/30">
+                    <i data-lucide="key-round" class="w-7 h-7"></i>
+                </div>
+                <h3 class="font-display font-extrabold text-2xl text-slate-800" id="auth-modal-title">Access Page / Create Handle</h3>
+                <p class="text-xs sm:text-sm text-slate-500 max-w-xs mx-auto">
+                    Enter your username handle and secret PIN. First-time handles will automatically register with your PIN!
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Page Username / Handle</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-3.5 text-slate-400 font-bold">@</span>
+                        <input type="text" id="auth-username" placeholder="e.g. pinkcat or alex" class="w-full glass-input rounded-xl pl-9 pr-4 py-3 text-slate-800 font-semibold text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Secret Passcode / PIN</label>
+                    <input type="password" id="auth-pin" placeholder="Enter 4-8 digit PIN" maxlength="8" class="w-full glass-input rounded-xl px-4 py-3 text-slate-800 font-semibold text-sm">
+                    <p class="text-[11px] text-slate-400 mt-1">Remember this PIN to unlock your dashboard later!</p>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeAuthModal()" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm py-3 rounded-xl transition-all">
+                    Cancel
+                </button>
+                <button onclick="processAuthAction()" class="w-2/3 bg-gradient-to-r from-lavender-600 to-purple-600 hover:from-lavender-700 hover:to-purple-700 text-white font-bold text-sm py-3 rounded-xl shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Unlock / Claim Page</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CENTERED MODAL: Note Viewer (Owner View) -->
+    <div id="read-note-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full space-y-6 shadow-2xl transform scale-95 transition-all duration-300 relative border border-white/90" id="read-note-content">
+            <button onclick="closeReadModal()" class="absolute right-5 top-5 p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="flex items-center gap-3">
+                <span id="read-modal-sticker" class="text-3xl">🌸</span>
+                <div>
+                    <span id="read-modal-category" class="bg-pink-100 text-pink-700 text-xs font-bold px-2.5 py-0.5 rounded-full">Cute</span>
+                    <p id="read-modal-date" class="text-[11px] text-slate-400 font-medium mt-0.5">Just now</p>
+                </div>
+            </div>
+
+            <div id="read-modal-body" class="bg-purple-50/80 p-5 rounded-2xl border border-purple-100 text-slate-800 text-base font-medium leading-relaxed whitespace-pre-wrap min-h-[120px]">
+                Note content...
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+                <button onclick="sendHeartToNote()" id="btn-modal-heart" class="flex items-center gap-2 bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-200 px-4 py-2.5 rounded-xl font-bold text-xs transition-all">
+                    <i data-lucide="heart" class="w-4 h-4 fill-pink-500"></i>
+                    <span id="read-modal-hearts-count">0</span> Hearts
+                </button>
+                <button onclick="deleteActiveNote()" class="flex items-center gap-1.5 text-slate-400 hover:text-rose-600 text-xs font-semibold px-3 py-2 rounded-xl hover:bg-rose-50 transition-all">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <span>Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-slate-900/90 text-white px-5 py-3.5 rounded-2xl shadow-2xl backdrop-blur-md text-xs sm:text-sm font-semibold hidden">
+        <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400" id="toast-icon"></i>
+        <span id="toast-message">Action completed successfully!</span>
+    </div>
+
+    <!-- Firebase Real-time Initialization -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase state & configs
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'whisper-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "AIzaSyDemoKeyForWhisperNotesAppOnly",
+                authDomain: "whisper-demo.firebaseapp.com",
+                projectId: "whisper-demo",
+                storageBucket: "whisper-demo.appspot.com",
+                messagingSenderId: "1234567890",
+                appId: "1:1234567890:web:abcdef123456"
+            };
+
+        let app, db, auth;
+        let unsubscribeNotes = null;
+        window.cloudNotes = [];
+        window.firebaseActive = false;
+
+        async function initFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                window.firebaseActive = true;
+                const syncElem = document.getElementById('sync-indicator');
+                if (syncElem) {
+                    syncElem.innerText = '⚡ Realtime Live';
+                    syncElem.className = 'text-[10px] text-emerald-600 font-semibold border-l border-slate-200 pl-2';
+                }
+                
+                setupCloudListener(window.currentUser);
+            } catch (err) {
+                console.log("Firebase fallback to LocalStorage mode:", err);
+                const syncElem = document.getElementById('sync-indicator');
+                if (syncElem) {
+                    syncElem.innerText = '💾 Offline Mode';
+                    syncElem.className = 'text-[10px] text-slate-500 border-l border-slate-200 pl-2';
+                }
+                window.renderNotes();
+            }
+        }
+
+        window.setupCloudListener = function(username) {
+            if (!window.firebaseActive || !db) {
+                window.renderNotes();
+                return;
+            }
+
+            if (unsubscribeNotes) unsubscribeNotes();
+
+            try {
+                // Public collection rule: /artifacts/{appId}/public/data/{collectionName}
+                const notesCollection = collection(db, 'artifacts', appId, 'public', 'data', `messages_${username}`);
+                
+                unsubscribeNotes = onSnapshot(notesCollection, (snapshot) => {
+                    const notesArr = [];
+                    snapshot.forEach((docSnap) => {
+                        notesArr.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    
+                    // Sort descending in JS memory (No compound queries)
+                    notesArr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    window.cloudNotes = notesArr;
+                    window.renderNotes();
+                }, (error) => {
+                    console.error("Firestore listener error:", error);
+                    window.renderNotes();
+                });
+            } catch (e) {
+                console.error("Error setting up snapshot:", e);
+                window.renderNotes();
+            }
+        };
+
+        window.sendCloudNote = async function(noteObj) {
+            if (window.firebaseActive && db) {
+                try {
+                    const targetUser = window.currentUser;
+                    const notesCollection = collection(db, 'artifacts', appId, 'public', 'data', `messages_${targetUser}`);
+                    await addDoc(notesCollection, {
+                        ...noteObj,
+                        createdAt: Date.now()
+                    });
+                    return true;
+                } catch (e) {
+                    console.error("Failed cloud save:", e);
+                    return false;
+                }
+            }
+            return false;
+        };
+
+        window.updateCloudHeart = async function(noteId, currentHearts) {
+            if (window.firebaseActive && db) {
+                try {
+                    const noteRef = doc(db, 'artifacts', appId, 'public', 'data', `messages_${window.currentUser}`, noteId);
+                    await updateDoc(noteRef, { hearts: (currentHearts || 0) + 1 });
+                } catch (e) {
+                    console.error("Failed update heart:", e);
+                }
+            }
+        };
+
+        window.deleteCloudNote = async function(noteId) {
+            if (window.firebaseActive && db) {
+                try {
+                    const noteRef = doc(db, 'artifacts', appId, 'public', 'data', `messages_${window.currentUser}`, noteId);
+                    await deleteDoc(noteRef);
+                } catch (e) {
+                    console.error("Failed delete cloud note:", e);
+                }
+            }
+        };
+
+        initFirebase();
+    </script>
+
+    <!-- Main Application UI & Logic Script -->
+    <script>
+        // App State
+        window.currentUser = "alex";
+        window.isOwnerAuthenticated = false;
+        let currentTab = "send";
+        let selectedSticker = "🌸";
+        let selectedTheme = "lavender";
+        let selectedCategory = "Cute";
+        let activeReadingNoteId = null;
+
+        const STICKERS = ["🌸", "✨", "💌", "💖", "🌙", "🧁", "🐾", "🎀", "🧸", "🦄"];
+        
+        const THEMES = [
+            { id: 'lavender', bg: 'bg-purple-50/90', border: 'border-purple-200', text: 'text-purple-900', badge: 'bg-purple-200 text-purple-800' },
+            { id: 'rose', bg: 'bg-pink-50/90', border: 'border-pink-200', text: 'text-pink-900', badge: 'bg-pink-200 text-pink-800' },
+            { id: 'sky', bg: 'bg-sky-50/90', border: 'border-sky-200', text: 'text-sky-900', badge: 'bg-sky-200 text-sky-800' },
+            { id: 'mint', bg: 'bg-emerald-50/90', border: 'border-emerald-200', text: 'text-emerald-900', badge: 'bg-emerald-200 text-emerald-800' },
+            { id: 'peach', bg: 'bg-amber-50/90', border: 'border-amber-200', text: 'text-amber-900', badge: 'bg-amber-200 text-amber-800' },
+            { id: 'dark', bg: 'bg-slate-800/90', border: 'border-slate-700', text: 'text-white', badge: 'bg-slate-700 text-slate-200' },
+        ];
+
+        const INSPIRATIONS = [
+            "You make every room brighter just by walking into it! 🌟",
+            "Your kindness always leaves a lasting impression on everyone 💖",
+            "Keep smiling, it's literally contagious! ✨",
+            "Someone out here really appreciates all your hard work 🌸",
+            "You have the best taste in music and good vibes! 🎵"
+        ];
+        let inspirationIndex = 0;
+
+        // Init
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+            
+            // Check URL parameter ?u=username
+            const urlParams = new URLSearchParams(window.location.search);
+            const userParam = urlParams.get('u') || urlParams.get('user');
+            
+            if (userParam) {
+                window.currentUser = sanitizeHandle(userParam);
+                switchTab('send'); // Visitors default to send view
+            } else {
+                const savedUser = localStorage.getItem('whisper_active_user');
+                if (savedUser) window.currentUser = savedUser;
+            }
+
+            // Check if current user is logged in
+            const savedAuth = localStorage.getItem(`whisper_auth_${window.currentUser}`);
+            if (savedAuth === 'true') {
+                window.isOwnerAuthenticated = true;
+            }
+
+            updateUserDisplays();
+            initPickers();
+
+            const textarea = document.getElementById('note-text');
+            textarea.addEventListener('input', (e) => {
+                document.getElementById('char-count').innerText = `${e.target.value.length} / 300`;
+            });
+        });
+
+        function sanitizeHandle(str) {
+            return str.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20) || 'alex';
+        }
+
+        function initPickers() {
+            // Sticker Picker
+            const stickerContainer = document.getElementById('sticker-picker');
+            stickerContainer.innerHTML = STICKERS.map(s => `
+                <button type="button" onclick="selectSticker('${s}')" class="sticker-btn text-xl w-10 h-10 rounded-xl bg-white/80 hover:bg-white border border-white flex items-center justify-center transition-all ${s === selectedSticker ? 'ring-2 ring-lavender-600 scale-110 shadow-sm' : ''}">${s}</button>
+            `).join('');
+
+            // Theme Picker
+            const themeContainer = document.getElementById('theme-picker');
+            themeContainer.innerHTML = THEMES.map(t => `
+                <button type="button" onclick="selectTheme('${t.id}')" class="theme-btn p-2 rounded-xl border ${t.bg} ${t.border} text-xs font-bold transition-all flex items-center justify-center ${t.id === selectedTheme ? 'ring-2 ring-lavender-600 scale-105 shadow-sm' : ''}">
+                    ${t.id.charAt(0).toUpperCase() + t.id.slice(1)}
+                </button>
+            `).join('');
+        }
+
+        function selectSticker(s) {
+            selectedSticker = s;
+            initPickers();
+        }
+
+        function selectTheme(t) {
+            selectedTheme = t;
+            initPickers();
+        }
+
+        function selectCategory(cat) {
+            selectedCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.innerText.includes(cat)) {
+                    btn.classList.add('ring-2', 'ring-lavender-600');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-lavender-600');
+                }
+            });
+        }
+
+        function updateUserDisplays() {
+            document.getElementById('active-user-display').innerText = `@${window.currentUser}`;
+            document.getElementById('send-target-user').innerText = `@${window.currentUser}`;
+            document.getElementById('lock-handle-display').innerText = `@${window.currentUser}`;
+            document.getElementById('card-username').innerText = window.currentUser.charAt(0).toUpperCase() + window.currentUser.slice(1);
+            
+            const shareUrl = `${window.location.origin}${window.location.pathname}?u=${window.currentUser}`;
+            document.getElementById('card-handle').innerText = `whisper.me/?u=${window.currentUser}`;
+            document.getElementById('profile-avatar').innerText = window.currentUser.charAt(0).toUpperCase();
+            document.getElementById('share-link-input').innerText = shareUrl;
+
+            const modeBadge = document.getElementById('mode-badge');
+            const ownerStatsBar = document.getElementById('owner-stats-bar');
+            const loginBtnText = document.getElementById('nav-login-btn-text');
+
+            if (window.isOwnerAuthenticated) {
+                modeBadge.innerText = "Owner View";
+                modeBadge.className = "bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-1";
+                ownerStatsBar.classList.remove('hidden');
+                loginBtnText.innerText = `My Page (@${window.currentUser})`;
+            } else {
+                modeBadge.innerText = "Visitor Send Mode";
+                modeBadge.className = "bg-lavender-100 text-lavender-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-1";
+                ownerStatsBar.classList.add('hidden');
+                loginBtnText.innerText = "Owner Login";
+            }
+
+            if (window.setupCloudListener) {
+                window.setupCloudListener(window.currentUser);
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            const inboxView = document.getElementById('view-inbox');
+            const sendView = document.getElementById('view-send-form');
+            const tabInbox = document.getElementById('tab-btn-inbox');
+            const tabSend = document.getElementById('tab-btn-send');
+            const filterContainer = document.getElementById('filter-container');
+            const lockScreen = document.getElementById('owner-lock-screen');
+            const notesGrid = document.getElementById('notes-container');
+
+            if (tab === 'inbox') {
+                inboxView.classList.remove('hidden');
+                sendView.classList.add('hidden');
+
+                tabInbox.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-lavender-700 shadow-sm";
+                tabSend.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900";
+
+                if (window.isOwnerAuthenticated) {
+                    lockScreen.classList.add('hidden');
+                    notesGrid.classList.remove('hidden');
+                    filterContainer.classList.remove('hidden');
+                    window.renderNotes();
+                } else {
+                    lockScreen.classList.remove('hidden');
+                    notesGrid.classList.add('hidden');
+                    filterContainer.classList.add('hidden');
+                }
+            } else {
+                inboxView.classList.add('hidden');
+                sendView.classList.remove('hidden');
+                filterContainer.classList.add('hidden');
+
+                tabSend.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-lavender-700 shadow-sm";
+                tabInbox.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900";
+            }
+        }
+
+        function showMyOwnerDashboard() {
+            if (window.isOwnerAuthenticated) {
+                switchTab('inbox');
+            } else {
+                openAuthModal();
+            }
+        }
+
+        // Modal Controls
+        function openAuthModal() {
+            document.getElementById('auth-username').value = window.currentUser;
+            const modal = document.getElementById('auth-modal');
+            const content = document.getElementById('auth-modal-content');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            const content = document.getElementById('auth-modal-content');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+        }
+
+        function processAuthAction() {
+            const userVal = sanitizeHandle(document.getElementById('auth-username').value.trim());
+            const pinVal = document.getElementById('auth-pin').value.trim();
+
+            if (!userVal || !pinVal) {
+                showToast("Please enter both handle and PIN!", "alert-circle");
+                return;
+            }
+
+            const pinKey = `whisper_pin_${userVal}`;
+            const existingPin = localStorage.getItem(pinKey);
+
+            if (!existingPin) {
+                // Register new handle
+                localStorage.setItem(pinKey, pinVal);
+                localStorage.setItem(`whisper_auth_${userVal}`, 'true');
+                window.currentUser = userVal;
+                window.isOwnerAuthenticated = true;
+                showToast(`Page @${userVal} registered & unlocked!`, "sparkles");
+            } else if (existingPin === pinVal) {
+                // Login
+                localStorage.setItem(`whisper_auth_${userVal}`, 'true');
+                window.currentUser = userVal;
+                window.isOwnerAuthenticated = true;
+                showToast("Logged in! Dashboard unlocked.", "shield-check");
+            } else {
+                showToast("Incorrect PIN for this page handle!", "alert-circle");
+                return;
+            }
+
+            localStorage.setItem('whisper_active_user', window.currentUser);
+            updateUserDisplays();
+            closeAuthModal();
+            switchTab('inbox');
+        }
+
+        // Submitting Notes
+        async function submitSecretNote() {
+            const textInput = document.getElementById('note-text');
+            const text = textInput.value.trim();
+
+            if (!text) {
+                showToast("Please write a message first!", "alert-circle");
+                return;
+            }
+
+            const btn = document.getElementById('btn-submit-note');
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Sending Note...`;
+            lucide.createIcons();
+
+            const newNote = {
+                text: text,
+                sticker: selectedSticker,
+                theme: selectedTheme,
+                category: selectedCategory,
+                hearts: 0,
+                createdAt: Date.now()
+            };
+
+            // Real-time Cloud Save
+            await window.sendCloudNote(newNote);
+
+            // Also keep local copy
+            const localKey = `whisper_notes_${window.currentUser}`;
+            const localNotes = JSON.parse(localStorage.getItem(localKey) || '[]');
+            localNotes.unshift({ id: 'local_' + Date.now(), ...newNote });
+            localStorage.setItem(localKey, JSON.stringify(localNotes));
+
+            // Confetti effect
+            confetti({
+                particleCount: 70,
+                spread: 60,
+                origin: { y: 0.7 },
+                colors: ['#ba90f0', '#ec4899', '#818cf8']
+            });
+
+            textInput.value = '';
+            document.getElementById('char-count').innerText = '0 / 300';
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Send Secret Note Anonymously`;
+            lucide.createIcons();
+
+            showToast("Secret note sent anonymously! 💖", "sparkles");
+        }
+
+        // Render Notes Grid (Owner Only)
+        window.renderNotes = function() {
+            if (!window.isOwnerAuthenticated) return;
+
+            const notesGrid = document.getElementById('notes-container');
+            const emptyState = document.getElementById('empty-state');
+            const filterVal = document.getElementById('category-filter').value;
+
+            // Combine cloud + local notes cleanly
+            const localNotes = JSON.parse(localStorage.getItem(`whisper_notes_${window.currentUser}`) || '[]');
+            let allNotes = window.cloudNotes.length > 0 ? window.cloudNotes : localNotes;
+
+            if (filterVal !== 'all') {
+                allNotes = allNotes.filter(n => n.category === filterVal);
+            }
+
+            // Update stats
+            document.getElementById('stat-total-notes').innerText = allNotes.length;
+            const totalHearts = allNotes.reduce((acc, n) => acc + (n.hearts || 0), 0);
+            document.getElementById('stat-total-hearts').innerText = totalHearts;
+
+            if (allNotes.length === 0) {
+                notesGrid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            notesGrid.classList.remove('hidden');
+
+            notesGrid.innerHTML = allNotes.map((note) => {
+                const themeConfig = THEMES.find(t => t.id === note.theme) || THEMES[0];
+                const dateStr = note.createdAt ? new Date(note.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Recently';
+
+                return `
+                    <div onclick="openReadModal('${note.id}')" class="note-card-hover ${themeConfig.bg} ${themeConfig.border} border p-5 rounded-3xl cursor-pointer flex flex-col justify-between min-h-[170px] relative overflow-hidden group">
+                        <div class="flex items-start justify-between gap-2 mb-3">
+                            <span class="text-2xl transform group-hover:scale-125 transition-transform">${note.sticker || '🌸'}</span>
+                            <span class="${themeConfig.badge} text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">${note.category || 'Cute'}</span>
+                        </div>
+                        <p class="${themeConfig.text} text-sm font-medium leading-relaxed line-clamp-3 mb-4">
+                            "${escapeHtml(note.text)}"
+                        </p>
+                        <div class="flex items-center justify-between text-[11px] opacity-75 font-semibold">
+                            <span>${dateStr}</span>
+                            <span class="flex items-center gap-1 text-pink-600">
+                                <i data-lucide="heart" class="w-3.5 h-3.5 fill-pink-500"></i>
+                                ${note.hearts || 0}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        };
+
+        function openReadModal(noteId) {
+            const localNotes = JSON.parse(localStorage.getItem(`whisper_notes_${window.currentUser}`) || '[]');
+            const note = window.cloudNotes.find(n => n.id === noteId) || localNotes.find(n => n.id === noteId);
+
+            if (!note) return;
+
+            activeReadingNoteId = noteId;
+            document.getElementById('read-modal-sticker').innerText = note.sticker || '🌸';
+            document.getElementById('read-modal-category').innerText = note.category || 'Cute';
+            document.getElementById('read-modal-body').innerText = note.text;
+            document.getElementById('read-modal-hearts-count').innerText = note.hearts || 0;
+            document.getElementById('read-modal-date').innerText = note.createdAt ? new Date(note.createdAt).toLocaleString() : 'Just now';
+
+            const modal = document.getElementById('read-note-modal');
+            const content = document.getElementById('read-note-content');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+        }
+
+        function closeReadModal() {
+            const modal = document.getElementById('read-note-modal');
+            const content = document.getElementById('read-note-content');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            activeReadingNoteId = null;
+        }
+
+        async function sendHeartToNote() {
+            if (!activeReadingNoteId) return;
+            const countElem = document.getElementById('read-modal-hearts-count');
+            const curr = parseInt(countElem.innerText) || 0;
+            countElem.innerText = curr + 1;
+
+            await window.updateCloudHeart(activeReadingNoteId, curr);
+            window.renderNotes();
+            showToast("Liked secret note! ❤️", "heart");
+        }
+
+        async function deleteActiveNote() {
+            if (!activeReadingNoteId) return;
+            await window.deleteCloudNote(activeReadingNoteId);
+            
+            // Also clean local storage copy
+            const localKey = `whisper_notes_${window.currentUser}`;
+            let localNotes = JSON.parse(localStorage.getItem(localKey) || '[]');
+            localNotes = localNotes.filter(n => n.id !== activeReadingNoteId);
+            localStorage.setItem(localKey, JSON.stringify(localNotes));
+
+            closeReadModal();
+            window.renderNotes();
+            showToast("Note deleted.", "trash-2");
+        }
+
+        function nextInspiration() {
+            inspirationIndex = (inspirationIndex + 1) % INSPIRATIONS.length;
+            document.getElementById('inspiration-quote').innerText = `"${INSPIRATIONS[inspirationIndex]}"`;
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function copyShareLink() {
+            const fullUrl = `${window.location.origin}${window.location.pathname}?u=${window.currentUser}`;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(fullUrl).then(() => {
+                    showToast("Shareable link copied! 🚀", "copy");
+                }).catch(() => fallbackCopy(fullUrl));
+            } else {
+                fallbackCopy(fullUrl);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Shareable link copied! 🚀", "copy");
+            } catch (err) {
+                showToast("Failed to copy link", "alert-circle");
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message, iconName = 'check-circle') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMessage.innerText = message;
+            toastIcon.setAttribute('data-lucide', iconName);
+            lucide.createIcons();
+
+            toast.classList.remove('hidden');
+            toast.classList.add('toast-animate');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
